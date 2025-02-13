@@ -7,10 +7,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "my-terraform-statefiles"
-    key            = "platform/terraform.tfstate"
-    region         = "eu-north-1"
-    profile        = "root/AdministratorAccess" # fix me!
+    bucket         = ""
+    key            = ""
+    region         = ""
+    profile        = ""
+    assume_role = ""
     use_lockfile   = true
     dynamodb_table = "terraform.statelock.platform"
   }
@@ -19,6 +20,22 @@ terraform {
 provider "aws" {
   region  = "eu-north-1"
   profile = "platform"
+  default_tags {
+    tags = {
+      "environment" = "sandbox"
+      "deployment"  = "iac"
+      "iac"         = "terraform/minimal-data-platform/platform"
+    }
+  }
+}
+
+provider "aws" {
+  alias = "mgmt"
+  region  = "eu-north-1"
+  profile = "platform"
+  assume_role {
+    role_arn = var.mgmt_account_role_arn
+  }
   default_tags {
     tags = {
       "environment" = "sandbox"

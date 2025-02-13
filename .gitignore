@@ -21,3 +21,6 @@ terraform.rc
 # Ignore sensitive variable files
 *.tfvars
 *.tfvars.json
+
+# Ignore sensitive .config files
+*.config

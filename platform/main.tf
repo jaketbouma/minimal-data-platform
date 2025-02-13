@@ -1,11 +1,13 @@
 
 resource "aws_identitystore_group" "marketplace_admins" {
+  provider = aws.mgmt
   display_name      = "Marketplace administrators"
   description       = "Platform engineers building the marketplace"
   identity_store_id = local.identity_store_id
 }
 
 resource "aws_identitystore_group" "marketplace_shoppers" {
+  provider = aws.mgmt
   display_name      = "Marketplace shoppers"
   description       = "Shoppers browsing all data in the marketplace and using basic tools"
   identity_store_id = local.identity_store_id
