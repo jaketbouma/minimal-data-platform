@@ -1,27 +1,50 @@
 
-resource "aws_s3_bucket" "demo" {
-  bucket_prefix = "demo-data"
-  force_destroy = true
-  tags = {
-    Name = "My demo data"
-    Environment = "Sandbox"
-  }
+resource "aws_identitystore_group" "marketplace_admins" {
+  display_name      = "Marketplace administrators"
+  description       = "Platform engineers building the marketplace"
+  identity_store_id = local.identity_store_id
 }
 
-resource "aws_s3_object" "dog_walks" {
-  bucket = aws_s3_bucket.demo.bucket
-  key    = "dog_walks.json"
-  content = <<EOF
-[
-  {"date": "2023-10-01", "duration": 30, "distance": 2.5},
-  {"date": "2023-10-02", "duration": 45, "distance": 3.0},
-  {"date": "2023-10-03", "duration": 20, "distance": 1.5},
-  {"date": "2023-10-04", "duration": 50, "distance": 4.0},
-  {"date": "2023-10-05", "duration": 35, "distance": 2.8}
-]
-EOF
+resource "aws_identitystore_group" "marketplace_shoppers" {
+  display_name      = "Marketplace shoppers"
+  description       = "Shoppers browsing all data in the marketplace and using basic tools"
+  identity_store_id = local.identity_store_id
+}
 
+resource "aws_lakeformation_data_lake_settings" "platform" {
+  admins = ["arn:aws:iam::${local.account_id}:role/Admin"]
+}
+
+
+resource "aws_glue_catalog_database" "platform" {
+  name        = "platform"
+  catalog_id  = local.account_id
+  description = "Glue database for platform-related datasets"
+}
+
+resource "aws_glue_catalog_database" "sandbox" {
+  name        = "sandbox"
+  catalog_id  = local.account_id
+  description = "Default glue catalog database for developing integrations"
+}
+
+
+resource "aws_athena_workgroup" "sandbox" {
+  name = "sandbox"
+
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = false
+
+    result_configuration {
+      output_location = "s3://${aws_s3_bucket.demo.bucket}/output/"
+
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
+    }
+  }
   tags = {
-    Name = "Dog Walks Data"
+    Environment = "Sandbox"
   }
 }

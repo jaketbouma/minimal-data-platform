@@ -8,17 +8,17 @@ terraform {
 
   backend "s3" {
     bucket         = "my-terraform-statefiles"
-    key            = "bookstore/terraform.tfstate"
+    key            = "platform/terraform.tfstate"
     region         = "eu-north-1"
-    profile        = "root/AdministratorAccess"  # fix me!
+    profile        = "root/AdministratorAccess" # fix me!
     use_lockfile   = true
     dynamodb_table = "terraform.statelock.platform"
   }
 }
 
 provider "aws" {
-  region              = "eu-north-1"
-  profile             = "platform"
+  region  = "eu-north-1"
+  profile = "platform"
   default_tags {
     tags = {
       "environment" = "sandbox"
@@ -26,4 +26,20 @@ provider "aws" {
       "iac"         = "terraform/minimal-data-platform/platform"
     }
   }
+}
+
+#
+# Grab some stuff that could also have been vars
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
+data "aws_ssoadmin_instances" "all" {}
+
+locals {
+  identity_store_id  = tolist(data.aws_ssoadmin_instances.all.identity_store_ids)[0]
+  identity_store_arn = tolist(data.aws_ssoadmin_instances.all.arns)[0]
 }
