@@ -11,7 +11,7 @@ terraform {
     key            = ""
     region         = ""
     profile        = ""
-    assume_role = ""
+    assume_role    = ""
     use_lockfile   = true
     dynamodb_table = "terraform.statelock.platform"
   }
@@ -30,7 +30,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "mgmt"
+  alias   = "mgmt"
   region  = "eu-north-1"
   profile = "platform"
   assume_role {
