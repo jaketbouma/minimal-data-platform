@@ -58,8 +58,8 @@ resource "aws_glue_catalog_table" "dog_walks" {
     }
   }
   parameters = {
-    "raw" = aws_glue_catalog_table.dog_walks_raw.id
-    "iac" = "terraform/minimal-data-platform/platform"
+    "raw"    = aws_glue_catalog_table.dog_walks_raw.id
+    "iac"    = "terraform/minimal-data-platform/platform"
     "domain" = "demo"
   }
 }
@@ -88,7 +88,7 @@ resource "aws_glue_catalog_table" "dog_walks_raw" {
     }
   }
   parameters = {
-    "iac" = "terraform/minimal-data-platform/platform"
+    "iac"    = "terraform/minimal-data-platform/platform"
     "domain" = "demo"
   }
 }

@@ -50,3 +50,4 @@ resource "aws_athena_workgroup" "sandbox" {
     Environment = "Sandbox"
   }
 }
+

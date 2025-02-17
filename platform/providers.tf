@@ -22,6 +22,7 @@ provider "aws" {
   profile = "platform"
   default_tags {
     tags = {
+      "project"     = "platform"
       "environment" = "sandbox"
       "deployment"  = "iac"
       "iac"         = "terraform/minimal-data-platform/platform"
@@ -38,6 +39,7 @@ provider "aws" {
   }
   default_tags {
     tags = {
+      "project"     = "platform"
       "environment" = "sandbox"
       "deployment"  = "iac"
       "iac"         = "terraform/minimal-data-platform/platform"
