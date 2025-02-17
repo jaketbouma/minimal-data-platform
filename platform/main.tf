@@ -13,11 +13,6 @@ resource "aws_identitystore_group" "marketplace_shoppers" {
   identity_store_id = local.identity_store_id
 }
 
-resource "aws_lakeformation_data_lake_settings" "platform" {
-  admins = ["arn:aws:iam::${local.account_id}:role/Admin"]
-}
-
-
 resource "aws_glue_catalog_database" "platform" {
   name        = "platform"
   catalog_id  = local.account_id

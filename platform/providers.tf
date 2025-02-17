@@ -59,6 +59,6 @@ locals {
 data "aws_ssoadmin_instances" "all" {}
 
 locals {
-  identity_store_id  = tolist(data.aws_ssoadmin_instances.all.identity_store_ids)[0]
-  identity_store_arn = tolist(data.aws_ssoadmin_instances.all.arns)[0]
+  identity_store_id  = one(data.aws_ssoadmin_instances.all.identity_store_ids)
+  identity_store_arn = one(data.aws_ssoadmin_instances.all.arns)
 }

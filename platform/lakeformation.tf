@@ -1,4 +1,3 @@
-
 #
 # Lakeformation (doge)
 #
@@ -122,10 +121,10 @@ locals {
 #
 # configuring lakeformation
 #  https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_permissions#example-usage
-resource "aws_lakeformation_data_lake_settings" "version" {
+resource "aws_lakeformation_data_lake_settings" "platform" {
   # terraform_developers and lakeformation_admins will get admin
-  admins = [local.sso_lakeformation_admin_role_arn, local.sso_terraform_developers_role_arn]
-
+  admins     = [local.sso_lakeformation_admin_role_arn, local.sso_terraform_developers_role_arn]
+  catalog_id = local.account_id
   #create_database_default_permissions {
   #  permissions = ["SELECT", "ALTER", "DROP"]
   #  principal   = local.sso_lakeformation_admin_role_arn
@@ -135,5 +134,33 @@ resource "aws_lakeformation_data_lake_settings" "version" {
   #  permissions = ["ALL"]
   #  principal   = local.sso_lakeformation_admin_role_arn
   #}
+}
+data "aws_organizations_organization" "current" {}
+locals {
+  organization_id = data.aws_organizations_organization.current.id
+  lakeformation_identity_center_configuration_cli_json = {
+    "CatalogId" : local.account_id
+    "InstanceArn" : local.identity_store_arn
+    #"ExternalFiltering": {
+    #    "Status": "ENABLED",
+    #    "AuthorizedTargets": [
+    #        ""
+    #    ]
+    #},
+    #"ShareRecipients": [
+    #    {"DataLakePrincipalIdentifier": data.aws_organizations_organization.current.arn}
+    #]
+  }
+}
 
+resource "null_resource" "lakeformation_identity_center_configuration" {
+  # https://github.com/hashicorp/terraform-provider-aws/issues/35260
+  provisioner "local-exec" {
+    command = <<EOT
+      aws lakeformation create-lake-formation-identity-center-configuration \
+        --profile platform \
+        --cli-input-json '${jsonencode(local.lakeformation_identity_center_configuration_cli_json)}'
+    EOT
+  }
+  depends_on = [aws_lakeformation_data_lake_settings.platform]
 }
