@@ -2,17 +2,17 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.7"
     }
   }
 
   backend "s3" {
-    bucket         = "my-terraform-statefiles"
-    key            = "bookstore/terraform.tfstate"
-    region         = "eu-north-1"
-    profile        = "root/AdministratorAccess"  # fix me!
+    bucket         = ""
+    key            = ""
+    region         = ""
+    profile        = ""
     use_lockfile   = true
-    dynamodb_table = "terraform.statelock.bookstore"
+    dynamodb_table = ""
   }
 }
 
