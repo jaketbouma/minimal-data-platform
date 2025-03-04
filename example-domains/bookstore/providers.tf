@@ -17,8 +17,8 @@ terraform {
 }
 
 provider "aws" {
-  region              = "eu-north-1"
-  profile             = "bookstore"
+  region  = "eu-north-1"
+  profile = "bookstore"
   default_tags {
     tags = {
       "environment" = "sandbox"

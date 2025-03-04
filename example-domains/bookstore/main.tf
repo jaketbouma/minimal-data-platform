@@ -1,26 +1,23 @@
-#
-# Upload sample data
 
-resource "aws_s3_bucket" "bookstore" {
-  bucket_prefix = "bookstore"
-  force_destroy = true
-  tags = {
-    Name = "Sample bookstore data"
-    Environment = "Sandbox"
-    Source = "https://help.tableau.com/current/pro/desktop/en-us/bookshop_data.htm"
-    Domain = "Bookstore Warehouse"
-  }
+data "aws_caller_identity" "current" {}
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
 }
 
-resource "aws_s3_object" "csv_files" {
-  for_each = fileset("${path.module}/sample_data", "*.csv")
-  bucket   = aws_s3_bucket.bookstore.bucket
-  key      = "tableau_bookstore_sample/${each.value}"
-  source   = "${path.module}/sample_data/${each.value}"
-  etag     = filemd5("${path.module}/sample_data/${each.value}")
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+  sso_terraform_developers_role_arn = data.aws_iam_session_context.current.issuer_arn
+}
 
-  tags = {
-    Domain = "Bookstore Warehouse"
+#
+# configuring lakeformation
+#  https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_permissions#example-usage
+resource "aws_lakeformation_data_lake_settings" "platform" {
+  # terraform_developers and lakeformation_admins will get admin
+  admins     = [local.sso_terraform_developers_role_arn]
+  catalog_id = local.account_id
+  parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
   }
 }
 
@@ -28,7 +25,6 @@ resource "aws_athena_workgroup" "sandbox" {
   name = "sandbox"
 
   configuration {
-    enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = false
 
     result_configuration {
@@ -41,5 +37,16 @@ resource "aws_athena_workgroup" "sandbox" {
   }
   tags = {
     Environment = "Sandbox"
+  }
+  force_destroy = true
+}
+
+resource "aws_athena_data_catalog" "example" {
+  name        = "marketplace"
+  description = "Marketplace data platform from the platform account"
+  type        = "GLUE"
+
+  parameters = {
+    "catalog-id" = var.platform_account_id
   }
 }
