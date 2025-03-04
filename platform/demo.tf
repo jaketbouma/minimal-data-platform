@@ -1,6 +1,30 @@
 #
 # Some demo data to test glue setup
+resource "aws_glue_catalog_database" "demo" {
+  name        = "demo"
+  catalog_id  = local.account_id
+  description = "Some play play data"
+}
 
+resource "aws_lakeformation_permissions" "demo" {
+  permissions = ["DESCRIBE"]
+  principal   = "703671920730"
+  database {
+    name = aws_glue_catalog_database.demo.name
+  }
+}
+
+/*
+resource "aws_lakeformation_permissions" "demo__dog_walks" {
+  permissions = ["ALL"]
+  principal   = "arn:aws:identitystore:::group/${aws_identitystore_group.lakeformation_data_engineers.group_id}"
+  database {
+    name = aws_glue_catalog_database.demo.name
+  }
+}*/
+
+# this wokrs...
+# aws lakeformation grant-permissions --principal DataLakePrincipalIdentifier=arn:aws:identitystore:::group/b0cc49ec-1091-704b-30c0-fb9457005b07 --resource '{ "Database": {"Name":"demo"}}' --permissions "ALL" --profile platform
 
 resource "aws_s3_bucket" "demo" {
   bucket_prefix = "demo-data"
@@ -9,6 +33,12 @@ resource "aws_s3_bucket" "demo" {
     Name        = "My demo data"
     Environment = "Sandbox"
   }
+}
+
+resource "aws_lakeformation_resource" "demo" {
+  arn                     = aws_s3_bucket.demo.arn
+  use_service_linked_role = true
+  hybrid_access_enabled   = true
 }
 
 resource "aws_s3_object" "dog_walks" {
@@ -29,7 +59,7 @@ EOF
 
 resource "aws_glue_catalog_table" "dog_walks" {
   name          = "dog_walks"
-  database_name = aws_glue_catalog_database.platform.name
+  database_name = aws_glue_catalog_database.demo.name
   catalog_id    = local.account_id
   table_type    = "EXTERNAL_TABLE"
 
@@ -65,7 +95,7 @@ resource "aws_glue_catalog_table" "dog_walks" {
 }
 resource "aws_glue_catalog_table" "dog_walks_raw" {
   name          = "dog_walks_raw"
-  database_name = aws_glue_catalog_database.platform.name
+  database_name = aws_glue_catalog_database.demo.name
   catalog_id    = local.account_id
   table_type    = "EXTERNAL_TABLE"
 
@@ -92,3 +122,18 @@ resource "aws_glue_catalog_table" "dog_walks_raw" {
     "domain" = "demo"
   }
 }
+
+
+# https://github.com/hashicorp/terraform-provider-aws/issues/21539
+# open issue...
+/*
+resource "aws_lakeformation_permissions" "dog_walks" {
+  principal   = "arn:aws:identitystore:::group/${aws_identitystore_group.lakeformation_data_engineers.group_id}"
+  permissions = ["SELECT"]
+
+  table {
+    name          = aws_glue_catalog_table.dog_walks.name
+    database_name = aws_glue_catalog_table.dog_walks.database_name
+    catalog_id    = aws_glue_catalog_table.dog_walks.catalog_id
+  }
+}*/
