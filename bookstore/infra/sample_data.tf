@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "bookstore_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::692859944106:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
+      identifiers = [var.lake_formation_data_access_role_arn]
     }
     actions = [
       "s3:GetObject",
@@ -39,16 +39,16 @@ resource "aws_s3_bucket_policy" "bookstore_policy" {
 
 locals {
   bookstore_csv_files = {
-    for file in fileset("${path.module}/sample_data", "*.csv") :
-    lower(replace(split("-", file)[0], " ", "_")) => file
+    for file in fileset("${path.module}/sample-data", "*.csv") :
+    lower(replace(split(".", file)[0], " ", "_")) => file
   }
 }
 resource "aws_s3_object" "csv_files" {
   for_each = local.bookstore_csv_files
   bucket   = aws_s3_bucket.bookstore.bucket
   key      = "tableau_bookstore_sample/${each.key}/${each.value}"
-  source   = "${path.module}/sample_data/${each.value}"
-  etag     = filemd5("${path.module}/sample_data/${each.value}")
+  source   = "${path.module}/sample-data/${each.value}"
+  etag     = filemd5("${path.module}/sample-data/${each.value}")
 
   tags = {
     Domain = "Bookstore Warehouse"
