@@ -1,13 +1,8 @@
 
-data "aws_iam_roles" "sso_lakeformation_admin" {
-  name_regex  = "AWSReservedSSO_${aws_ssoadmin_permission_set.lakeformation_admin.name}_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
 data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
 }
 locals {
-  sso_lakeformation_admin_role_arn  = one(data.aws_iam_roles.sso_lakeformation_admin.arns)
   sso_terraform_developers_role_arn = data.aws_iam_session_context.current.issuer_arn
 }
 
@@ -30,6 +25,9 @@ resource "aws_lakeformation_data_lake_settings" "platform" {
     "CROSS_ACCOUNT_VERSION" = "4"
   }
 }
+
+
+/*
 
 locals {
   #organization_id = data.aws_organizations_organization.current.id
@@ -56,3 +54,5 @@ resource "null_resource" "lakeformation_identity_center_configuration" {
   triggers = {"cmd": jsonencode(local.lakeformation_identity_center_configuration_cli_json)}
   depends_on = [aws_lakeformation_data_lake_settings.platform]
 }
+
+*/

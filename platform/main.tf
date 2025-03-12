@@ -1,19 +1,9 @@
 data "aws_organizations_organization" "current" {}
-data "aws_organizations_organizational_unit_child_accounts" "root_ous" {
-  provider  = aws.mgmt
-  parent_id = var.aws_ou_to_grant_data_lake_access
-}
-locals {
-  aws_account_ids_to_grant_data_lake_access = { for account in data.aws_organizations_organizational_unit_child_accounts.root_ous.accounts : account.name => account.id if account.status == "ACTIVE" }
-}
 
 locals {
   project_short_name = "platform"
   region = "eu-north-1"
 }
-
-
-
 
 #
 # Athena
@@ -40,25 +30,4 @@ resource "aws_athena_workgroup" "playground" {
     Environment = "Sandbox"
   }
   force_destroy = true
-}
-
-
-data "aws_iam_policy_document" "glue_catalog_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "glue:GetDatabase"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [
-        for id in local.aws_account_ids_to_grant_data_lake_access:
-        "arn:aws:iam::${id}:root"
-      ]
-    }
-    resources = [
-      "arn:aws:glue:${local.region}:${local.account_id}:catalog",
-      "arn:aws:glue:${local.region}:${local.account_id}:database/demo"
-    ]
-  }
 }

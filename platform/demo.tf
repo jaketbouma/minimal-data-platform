@@ -6,13 +6,14 @@ resource "aws_glue_catalog_database" "demo" {
   description = "Some play play data"
 }
 
+/*
 resource "aws_lakeformation_permissions" "demo" {
   permissions = ["DESCRIBE"]
   principal   = "703671920730"
   database {
     name = aws_glue_catalog_database.demo.name
   }
-}
+}*/
 
 /*
 resource "aws_lakeformation_permissions" "demo__dog_walks" {

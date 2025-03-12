@@ -30,23 +30,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias   = "mgmt"
-  region  = "eu-north-1"
-  profile = "platform"
-  assume_role {
-    role_arn = var.mgmt_account_role_arn
-  }
-  default_tags {
-    tags = {
-      "project"     = "platform"
-      "environment" = "sandbox"
-      "deployment"  = "iac"
-      "iac"         = "terraform/minimal-data-platform/platform"
-    }
-  }
-}
-
 #
 # Grab some stuff that could also have been vars
 
