@@ -3,7 +3,7 @@
 
 locals {
   domain_data_location_arns = {
-    "bookstore" = "arn:aws:s3:::bookstore20250225101419468000000001/tableau_bookstore_sample/"
+    "bookstore" = "arn:aws:s3:::bookstore20250312130958949200000001/tableau_bookstore_sample/"
   }
   domain_database_names = {
     "bookstore" = "bookstore"
@@ -33,7 +33,7 @@ resource "aws_glue_catalog_table" "bookstore_author" {
   table_type    = "EXTERNAL_TABLE"
 
   storage_descriptor {
-    location      = "s3://bookstore20250225101419468000000001/tableau_bookstore_sample/author"
+    location      = "s3://bookstore20250312130958949200000001/tableau_bookstore_sample/author"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
     ser_de_info {
@@ -82,7 +82,7 @@ resource "aws_glue_catalog_table" "author_raw" {
   table_type    = "EXTERNAL_TABLE"
 
   storage_descriptor {
-    location      = "s3://bookstore20250225101419468000000001/tableau_bookstore_sample/author"
+    location      = "s3://bookstore20250312130958949200000001/tableau_bookstore_sample/author"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
     ser_de_info {
