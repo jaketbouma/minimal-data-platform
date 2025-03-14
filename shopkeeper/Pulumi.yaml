@@ -1,0 +1,11 @@
+name: pulumiplace
+description: A minimal AWS Python Pulumi program
+main: shopkeeper
+runtime:
+  name: python
+  options:
+    toolchain: poetry
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python
